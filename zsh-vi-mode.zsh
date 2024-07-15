@@ -1889,8 +1889,6 @@ function zvm_repeat_command {
 function zvm_vi_edit_command_line() {
   # Create a temporary file and save the BUFFER to it
   local tmp_file=$(mktemp ${ZVM_TMPDIR}/zshXXXXXX)
-  if command -v ydotool &> /dev/null; then
-  fi
 
   # Print the scrollback buffer into the editor so that it can be searched back
   if command -v ydotool &> /dev/null; then
@@ -1932,7 +1930,7 @@ function zvm_vi_edit_command_line() {
   #
   # Also removes the scrollback buffer comments on top until the first break 
   # of the comments then remove all the empty lines that were left from the
-  # initial replace. I wasn't able to find a more concise solution at that
+  # initial replace. I wasn't able to find a more concise solution at this
   # point.
   BUFFER=$(cat $tmp_file | sed '0, /^[^#]+\r\n/ s/^#.*//g' | sed '/./,$!d')
   rm "$tmp_file"
