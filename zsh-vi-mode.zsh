@@ -1889,21 +1889,52 @@ function zvm_repeat_command {
 function zvm_vi_edit_command_line() {
   # Create a temporary file and save the BUFFER to it
   local tmp_file=$(mktemp ${ZVM_TMPDIR}/zshXXXXXX)
+  if command -v ydotool &> /dev/null; then
+  fi
+
+  # Print the scrollback buffer into the editor so that it can be searched back
+  if command -v ydotool &> /dev/null; then
+    # This hack is foot specific and it depends on my own configuration, hence
+    # why this is implemented in a personal fork instead.
+    if command -v foot &> /dev/null; then
+      # Mod4 (Win/Super/Meta) + x is configured to print the scrollback buffer to
+      # /tmp/zsh-vi-mode-scrollback, which then can be echoed into the tmp file 
+      # After that the command prompt can be written there as usual.
+      # I'm using foot
+      
+      # less /usr/include/linux/input-event-codes.h for the keys
+      # the super key is called META here 🤷
+      YDOTOOL_SOCKET="/tmp/ydotoold.socket" ydotool key '125:1' '45:1' '45:0' '125:0' > /dev/null
+      cat "/tmp/zsh-vi-mode-scrollback" > "$tmp_file"
+      echo "\n" >> "$tmp_file" # a double /n to make it pretty
+    else
+      notify-send 'WARNING' "foot not found, scrollback won't be visible in the editor"
+    fi
+  else
+    notify-send 'WARNING' "ydotool not found, scrollback won't be visible in the editor"
+  fi
+
 
   # Some users may config the noclobber option to prevent from
   # overwriting existing files with the > operator, we should
   # use >! operator to ignore the noclobber.
-  echo "$BUFFER" >! "$tmp_file"
+  echo "$BUFFER" >>! "$tmp_file"
 
   # Edit the file with the specific editor, in case of
   # the warning about input not from a terminal (e.g.
   # vim), we should tell the editor input is from the
   # terminal and not from standard input.
-  "${(@Q)${(z)${ZVM_VI_EDITOR}}}" $tmp_file </dev/tty
+  # I'm also executing a command in normal mode to move to the end of the buffer
+  "${(@Q)${(z)${ZVM_VI_EDITOR}}}"  -c ':execute "normal G$"' $tmp_file </dev/tty
 
   # Reload the content to the BUFFER from the temporary
   # file after editing, and delete the temporary file.
-  BUFFER=$(cat $tmp_file)
+  #
+  # Also removes the scrollback buffer comments on top until the first break 
+  # of the comments then remove all the empty lines that were left from the
+  # initial replace. I wasn't able to find a more concise solution at that
+  # point.
+  BUFFER=$(cat $tmp_file | sed '0, /^[^#]+\r\n/ s/^#.*//g' | sed '/./,$!d')
   rm "$tmp_file"
 
   # Exit the visual mode
