@@ -1886,7 +1886,8 @@ function zvm_repeat_command {
 }
 
 # Edit command line in EDITOR
-function zvm_vi_edit_command_line() {
+function zvm_vi_edit_command_line()
+{
   # Create a temporary file and save the BUFFER to it
   local tmp_file=$(mktemp ${ZVM_TMPDIR}/zshXXXXXX)
 
@@ -3510,6 +3511,10 @@ function zvm_init() {
   zvm_bindkey vicmd 'I'  zvm_insert_bol
   zvm_bindkey vicmd 'A'  zvm_append_eol
 
+  # Customized command line edit
+  zvm_bindkey vicmd '^v' zvm_vi_edit_command_line
+  zvm_bindkey viins '^v' zvm_vi_edit_command_line
+
   # Other key bindings
   zvm_bindkey vicmd  'v' zvm_enter_visual_mode
   zvm_bindkey vicmd  'V' zvm_enter_visual_mode
@@ -3532,7 +3537,6 @@ function zvm_init() {
   zvm_bindkey visual 'U' zvm_vi_up_case
   zvm_bindkey visual 'u' zvm_vi_down_case
   zvm_bindkey visual '~' zvm_vi_opp_case
-  zvm_bindkey visual 'v' zvm_vi_edit_command_line
   zvm_bindkey vicmd  '.' zvm_repeat_change
 
   zvm_bindkey vicmd '^A' zvm_switch_keyword
