@@ -1896,10 +1896,10 @@ function zvm_vi_edit_command_line() {
     # why this is implemented in a personal fork instead.
     if command -v foot &> /dev/null; then
       # Mod4 (Win/Super/Meta) + x is configured to print the scrollback buffer to
-      # /tmp/zsh-vi-mode-scrollback, which then can be echoed into the tmp file 
+      # /tmp/zsh-vi-mode-scrollback, which then can be echoed into the tmp file
       # After that the command prompt can be written there as usual.
       # I'm using foot
-      
+
       # less /usr/include/linux/input-event-codes.h for the keys
       # the super key is called META here 🤷
       YDOTOOL_SOCKET="/tmp/ydotoold.socket" ydotool key '125:1' '45:1' '45:0' '125:0' > /dev/null
@@ -1928,7 +1928,7 @@ function zvm_vi_edit_command_line() {
   # Reload the content to the BUFFER from the temporary
   # file after editing, and delete the temporary file.
   #
-  # Also removes the scrollback buffer comments on top until the first break 
+  # Also removes the scrollback buffer comments on top until the first break
   # of the comments then remove all the empty lines that were left from the
   # initial replace. I wasn't able to find a more concise solution at this
   # point.
